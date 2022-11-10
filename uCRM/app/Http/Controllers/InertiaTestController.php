@@ -14,6 +14,11 @@ class InertiaTestController extends Controller
         return Inertia::render('Inertia/Index');
     }
 
+    public function create()
+    {
+        return Inertia::render('Inertia/Create');
+    }
+
     public function show($id)
     {
         // dd($id);
@@ -29,7 +34,7 @@ class InertiaTestController extends Controller
         $inertiaTest->title = $request->title;
         $inertiaTest->content = $request->content;
         $inertiaTest->save();
-        
+
         return to_route('inertia.index');
     }
 }
