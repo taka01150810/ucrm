@@ -2,7 +2,7 @@
 import { onMounted, ref } from 'vue';
 
 defineProps(['modelValue']);
-
+// カスタムイベント名
 defineEmits(['update:modelValue']);
 
 const input = ref(null);
@@ -15,5 +15,6 @@ onMounted(() => {
 </script>
 
 <template>
+    <!-- $emit(カスタムイベント名、渡したい値) -->
     <input class="border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm" :value="modelValue" @input="$emit('update:modelValue', $event.target.value)" ref="input">
 </template>
