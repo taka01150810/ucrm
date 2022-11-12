@@ -11,7 +11,10 @@ class InertiaTestController extends Controller
     //
     public function index()
     {
-        return Inertia::render('Inertia/Index');
+        return Inertia::render('Inertia/Index', [
+            //モデル経由でデータ取得する場合配列を拡張したコレクション型になる
+            'blogs' => InertiaTest::all() 
+        ]);
     }
 
     public function create()
