@@ -45,7 +45,8 @@ class HandleInertiaRequests extends Middleware
             },
             //fn() => は PHP7.4からのアロー関数。関数を挟むと 必要な時だけ呼び出される。
             'flash' => [
-                'message' => fn() => $request->session()->get('message')
+                'message' => fn() => $request->session()->get('message'),
+                'status' => fn() => $request->session()->get('status'),
             ],
         ]);
     }
