@@ -16,7 +16,12 @@ class ItemController extends Controller
      */
     public function index()
     {
-        return Inertia::render('Items/Index'); 
+        // dd(Item::select('id', 'name', 'price', 'is_selling')->get());
+
+        return Inertia::render('Items/Index',[
+            'items' => Item::select('id', 'name', 'price', 'is_selling')
+            ->get()
+        ]); 
     }
 
     /**
