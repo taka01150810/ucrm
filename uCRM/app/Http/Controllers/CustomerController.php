@@ -16,8 +16,13 @@ class CustomerController extends Controller
      */
     public function index()
     {
+        // $getTest = Customer::select('id', 'name', 'kana', 'tel')->get();
+        // $getPaginate = Customer::select('id', 'name', 'kana', 'tel')->paginate(50);
+        // dd($getTest, $getPaginate);
+        //結果 Collection型(配列の拡張系), Object型
+
         return Inertia::render('Customers/Index', [
-            'customers' => Customer::select('id', 'name', 'kana', 'tel')->get()
+            'customers' => Customer::select('id', 'name', 'kana', 'tel')->paginate(50)
         ]);
     }
 
