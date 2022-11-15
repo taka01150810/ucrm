@@ -16,13 +16,18 @@ class CustomerFactory extends Factory
      */
     public function definition()
     {
+        // 電話番号 -> ハイフンを削除
+        // 住所 -> 郵便番号と半角スペースをカット
+        $tel = str_replace('-', '', $this->faker->phoneNumber);
+        $address = mb_substr($this->faker->address, 9);
+
         return [
             'name' => $this->faker->name,
             'kana' => $this->faker->kanaName,
-            'tel' => $this->faker->phoneNumber,
+            'tel' => $tel,
             'email' => $this->faker->email,
             'postcode' => $this->faker->postcode,
-            'address' => $this->faker->address,
+            'address' => $address,
             'birthday' => $this->faker->dateTime,
             'gender' => $this->faker->numberBetween(0, 2),
             'memo' => $this->faker->realText(50),
