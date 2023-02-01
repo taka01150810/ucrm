@@ -21,8 +21,8 @@ const form = reactive({
     memo: null
 }) 
 
-const storeItem = () => {
-    Inertia.post('/items', form)
+const storeCustomer = () => {
+    Inertia.post('/customers', form)
 }
 </script>
 
@@ -43,7 +43,7 @@ const storeItem = () => {
                         <div class="p-6 bg-white border-b border-gray-200">
                             <BreezeValidationErrors class="mb-4" />
                             <section class="text-gray-600 body-font relative">
-                                <form @submit.prevent="storeItem">
+                                <form @submit.prevent=storeCustomer>
                                     <div class="container px-5 py-8 mx-auto">
                                         <div class="lg:w-1/2 md:w-2/3 mx-auto">
                                         <div class="flex flex-wrap -m-2">
@@ -100,12 +100,12 @@ const storeItem = () => {
                                             <div class="p-2 w-full">
                                             <div class="relative">
                                                 <label class="leading-7 text-sm text-gray-600">ステータス</label><br>
-                                                <input type="radio" id="gender0" name="is_selling" v-model="form.is_selling" value="0">
+                                                <input for="gender" type="radio" id="gender0" name="gender" v-model="form.gender" value="0">
                                                 <label class="ml-2 mr-2">男性</label>
-                                                <input type="radio" id="gender1" name="is_selling" v-model="form.is_selling" value="1">
-                                                <label class="ml-2 mr-2">女性</label>
-                                                <input type="radio" id="gender2" name="is_selling" v-model="form.is_selling" value="2">
-                                                <label class="ml-2 mr-2">その他</label>
+                                                <input type="radio" id="gender1" name="gender" v-model="form.gender" value="1">
+                                                <label for="gender" class="ml-2 mr-2">女性</label>
+                                                <input type="radio" id="gender2" name="gender" v-model="form.gender" value="2">
+                                                <label for="gender" class="ml-2 mr-2">その他</label>
                                             </div>
                                             </div>
 
