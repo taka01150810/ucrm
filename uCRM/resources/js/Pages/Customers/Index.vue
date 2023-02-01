@@ -4,10 +4,21 @@ import { Head, Link } from '@inertiajs/inertia-vue3';
 import FlashMessage from '@/Components/FlashMessage.vue';
 import { onMounted } from 'vue';
 import Pagination from '@/Components/Pagination.vue';
+import { ref } from 'vue'
+import { Inertia } from '@inertiajs/inertia';
+
 
 const props = defineProps({
     customers: Object
 })
+
+const search = ref('')
+
+// ref の値を取得するには .valueが必要
+const searchCustomers = () => {
+ Inertia.get(route('customers.index', { search: search.value }))
+} 
+
 </script>
 
 <template>
@@ -29,6 +40,10 @@ const props = defineProps({
                                 <div class="container px-5 py-8 mx-auto">
                                     <FlashMessage />
                                     <div class="lg:w-2/3 w-full mx-auto overflow-auto">
+                                        <div>
+                                            <input type="text" name="search" v-model="search">
+                                            <button class="bg-blue-300 text-white py-2 px-2" @click="searchCustomers">検索</button>
+                                        </div>
                                     <table class="table-auto w-full text-left whitespace-no-wrap">
                                         <thead>
                                         <tr>

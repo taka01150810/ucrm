@@ -21,7 +21,7 @@ class CustomerController extends Controller
          ->select('id', 'name', 'kana', 'tel')->paginate(50);
 
         return Inertia::render('Customers/Index', [
-            'customers' => Customer::select('id', 'name', 'kana', 'tel')->paginate(50)
+            'customers' => $customers
         ]);
     }
 
