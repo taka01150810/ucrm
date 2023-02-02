@@ -7,11 +7,27 @@ onMounted(() => {
     form.date = getToday()
 })
 
-const form = reactive({ date: null })
+const props = defineProps({
+    'customers': Array
+})
+
+const form = reactive({
+    date: null,
+    customer_id: null
+})
 
 </script> 
 
 <template>
     日付<br>
     <input type="date" name="date" v-model="form.date">
+
+    会員名<br>
+    <select name="customer" v-model="form.customer_id">
+    <option v-for="customer in customers" :value="customer.id" :key="customer.id">
+        {{ customer.id }} : {{ customer.name }}
+    </option>
+    </select>
+
+    
 </template>
