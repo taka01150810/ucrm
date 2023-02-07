@@ -3,6 +3,7 @@ import { getToday } from '@/common' // 別ファイルをインポート
 import { onMounted, reactive } from 'vue'
 import { ref } from 'vue'
 import { computed } from 'vue'
+import { Inertia } from '@inertiajs/inertia'
 
 // ページ読み込み後 即座に実行
 onMounted(() => {
@@ -16,7 +17,9 @@ const props = defineProps({
 
 const form = reactive({
     date: null,
-    customer_id: null
+    customer_id: null,
+    status: true,
+    items: []
 })
 
 // リアクティブな配列を準備
@@ -43,9 +46,23 @@ const totalPrice = computed(() => {
     })
     return total
 })
+
+const storePurchase = () => {
+    itemList.value.forEach( item => {
+         // 0より大きいものだけ追加
+        if( item.quantity > 0 ){
+            form.items.push({
+                id : item.id,
+                quantity: item.quantity
+            })
+        }
+    })
+    Inertia.post(route('purchases.store'), form)
+} 
 </script> 
 
 <template>
+<form @submit.prevent="storePurchase">
     日付<br>
     <input type="date" name="date" v-model="form.date">
 
@@ -79,4 +96,6 @@ const totalPrice = computed(() => {
     </tbody>
     <br>
     合計 {{ totalPrice }} 円
+    <button>登録する</button> 
+</form>
 </template>
