@@ -1,6 +1,11 @@
 <script setup>
 import axios from 'axios'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, reactive } from 'vue'
+
+const search = ref('')
+
+const customers = reactive({})
+
 
 onMounted(() => {
   axios.get('/api/user')
@@ -12,6 +17,23 @@ onMounted(() => {
 const isShow = ref(false)
 
 const toggleStatus = () => { isShow.value = !isShow.value }
+
+/*
+DBアクセスし取得するまでに若干時間がかかるので
+async-awaitを使って、取得後に表示させる
+*/
+const searchCustomers = async () => {
+  try{
+    await axios.get(`/api/searchCustomers/?search=${search.value}`)
+    .then( res => {
+      console.log(res.data)
+      customers.value = res.data
+    })
+    toggleStatus()
+  }catch (e){
+    console.log(e.message)
+  }
+}
 </script>
 <template>
 <div v-show="isShow" class="modal" id="modal-1" aria-hidden="true">
@@ -35,5 +57,6 @@ const toggleStatus = () => { isShow.value = !isShow.value }
       </div>
     </div>
 </div>
-<button type="button" @click="toggleStatus" data-micromodal-trigger="modal-1" href='javascript:;'>モーダルを開く</button>
+<input name="customer" v-model="search">
+<button type="button" @click="searchCustomers" data-micromodal-trigger="modal-1" href='javascript:;'>検索する</button>
 </template>
