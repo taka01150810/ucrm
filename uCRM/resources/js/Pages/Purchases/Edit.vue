@@ -1,5 +1,5 @@
 <script setup>
-import { Head, Link } from '@inertiajs/inertia-vue3';
+import { Head } from '@inertiajs/inertia-vue3';
 import { Inertia } from '@inertiajs/inertia'
 import BreezeValidationErrors from '@/Components/ValidationErrors.vue';
 import { getToday } from '@/common' // 別ファイルをインポート
@@ -8,27 +8,65 @@ import { ref } from 'vue'
 import { computed } from 'vue'
 import dayjs from 'dayjs'
 
-// ページ読み込み後 即座に実行
-onMounted(() => {
-    console.log(props.items)
-    console.log(props.order)
-})
-
 const props = defineProps({
-    'items': Array,
-    'order': Array
+    'order': Array,
+    'items': Array
 })
 
+// リアクティブな配列を準備
+const itemList = ref([])
+
+onMounted(() => {
+    props.items.forEach( item => { // 配列を1つずつ処理
+        itemList.value.push({ // 配列に1つずつ追加
+            id: item.id,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity
+        })
+    })
+})
+
+const form = reactive({
+    date: dayjs(props.order[0].created_at).format("YYYY-MM-DD"),
+    customer_id: props.order[0].customer_id,
+    status: props.order[0].status,
+    items: [] 
+})
+
+// option用
+const quantity = [ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+
+const totalPrice = computed(() => {
+    let total = 0
+    itemList.value.forEach( item => {
+        total += item.price * item.quantity
+    })
+    return total
+})
+
+const storePurchase = () => {
+    itemList.value.forEach( item => {
+         // 0より大きいものだけ追加
+        if( item.quantity > 0 ){
+            form.items.push({
+                id : item.id,
+                quantity: item.quantity
+            })
+        }
+    })
+    Inertia.post(route('purchases.store'), form)
+}
 </script>
 
 <template>
     <div>
-        <Head title="購買履歴詳細画面" />
+        <Head title="購入編集画面" />
 
         <AuthenticatedLayout>
             <template #header>
                 <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                    購買履歴詳細画面
+                    購入編集画面
                 </h2>
             </template>
 
@@ -45,17 +83,13 @@ const props = defineProps({
                                             <div class="p-2 w-full">
                                             <div class="relative">
                                                 <label for="date" class="leading-7 text-sm text-gray-600">日付</label>
-                                                <div id="date" name="date" class="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out">
-                                                    {{ dayjs(props.order[0].created_at ).format('YYYY-MM-DD HH:mm:ss')  }}
-                                                </div>
+                                                <input disabled type="date" id="date" name="date" :value="form.date" class="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out">
                                             </div>
                                             </div>
                                             <div class="p-2 w-full">
                                             <div class="relative">
                                                 <label for="customer" class="leading-7 text-sm text-gray-600">会員名</label>
-                                                <div id="date" name="date" class="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out">
-                                                    {{ props.order[0].customer_name  }}
-                                                </div>
+                                                <input disabled type="text" id="customer" name="customer" :value="props.order[0].customer_name" class="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out">
                                             </div>
                                             </div>
                                             <div class="w-full mt-8 mx-auto overflow-auto">
@@ -70,12 +104,16 @@ const props = defineProps({
                                                     </tr>
                                                     </thead>
                                                     <tbody>
-                                                    <tr v-for="item in props.items" :key="item.id">
+                                                    <tr v-for="item in itemList" :key="item">
                                                         <td class="px-4 py-3">{{ item.id }}</td>
-                                                        <td class="px-4 py-3">{{ item.item_name }}</td>
-                                                        <td class="px-4 py-3">{{ item.item_price }}</td>
-                                                        <td class="px-4 py-3">{{ item.quantity }}</td>
-                                                        <td class="px-4 py-3">{{ item.subtotal }}</td>
+                                                        <td class="px-4 py-3">{{ item.name }}</td>
+                                                        <td class="px-4 py-3">{{ item.price }}</td>
+                                                        <td class="px-4 py-3">
+                                                            <select name="quantity" v-model="item.quantity">
+                                                                <option v-for="q in quantity" :value="q" :key="q">{{ q }}</option>
+                                                            </select>
+                                                        </td>
+                                                        <td class="px-4 py-3">{{ item.price * item.quantity }}</td>
                                                     </tr>
                                                     </tbody>
                                                 </table>
@@ -84,34 +122,19 @@ const props = defineProps({
                                                 <div>
                                                     <label for="price" class="leading-7 text-sm text-gray-600">合計金額</label>
                                                     <div class="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out">
-                                                        {{ props.order[0].total  }} 円
+                                                        {{ totalPrice }} 円
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="p-2 w-full">
-                                                <div>
-                                                    <label for="price" class="leading-7 text-sm text-gray-600">ステータス</label>
-                                                    <div v-if="props.order[0].status == true" class="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out">
-                                                        未キャンセル
-                                                    </div>
-                                                    <div v-if="props.order[0].status == false" class="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out">
-                                                        キャンセル済み
-                                                    </div>
-                                                </div>
+                                            <div class="relative">
+                                                <label for="status" class="leading-7 text-sm text-gray-600">ステータス</label>
+                                                <input type="radio" name="status" v-model="form.status" value="1">未キャンセル
+                                                <input type="radio" name="status" v-model="form.status" value="0">キャンセル済 
+                                            </div>
                                             </div>
                                             <div class="p-2 w-full">
-                                                <div>
-                                                    <label for="price" class="leading-7 text-sm text-gray-600">キャンセル日</label>
-                                                    <div v-if="props.order[0].status == false" class="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out">
-                                                        {{ dayjs(props.order[0].updated_at ).format('YYYY-MM-DD HH:mm:ss')  }}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <!-- キャンセル済みなら編集できなくする対応 -->
-                                            <div class="p-2 w-full" v-if="props.order[0].status == true">
-                                                <Link as="button" :href="route('purchases.edit', { purchase: props.order[0].id })" class="flex mx-auto text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-lg">
-                                                    編集する
-                                                </Link>
+                                            <button class="flex mx-auto text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-lg">登録する</button>
                                             </div>
                                         </div>
                                         </div>
