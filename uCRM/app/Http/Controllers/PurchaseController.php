@@ -117,7 +117,35 @@ class PurchaseController extends Controller
      */
     public function edit(Purchase $purchase)
     {
-        //
+        /*
+        中間テーブルの数量を確認し数が入っていれば反映させたい
+        Vue.js側でv-ifとv-forの組み合わせは非推奨なのでPHP側で配列をつくっておく
+        */
+        // 購買Idで指定
+        $purchase = Purchase::find($purchase->id);
+        // 全商品を取得
+        $allItems = Item::select('id', 'name', 'price')
+        ->get();
+
+        $items = [];
+
+        // 販売中の商品と中間テーブルを比較し、中間テーブルに数量があれば数量を取得、なければ0で設定
+        foreach($allItems as $allItem){
+            $quantity = 0; // 数量初期値 0
+            foreach($purchase->items as $item){ // 中間テーブルを1件ずつチェック
+                if($allItem->id === $item->id){ // 同じidがあれば
+                    $quantity = $item->pivot->quantity; // 中間テーブルの数量を設定 
+                }
+            }
+            array_push($items, [
+                'id' => $allItem->id,
+                'name' => $allItem->name,
+                'price' => $allItem->price,
+                'quantity' => $quantity 
+            ]);
+        }
+
+        dd($items);
     }
 
     /**
