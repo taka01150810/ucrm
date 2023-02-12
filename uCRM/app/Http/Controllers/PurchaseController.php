@@ -165,7 +165,7 @@ class PurchaseController extends Controller
      */
     public function update(UpdatePurchaseRequest $request, Purchase $purchase)
     {
-        //
+        dd($request, $purchase);
     }
 
     /**
