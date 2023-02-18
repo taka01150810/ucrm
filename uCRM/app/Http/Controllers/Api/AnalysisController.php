@@ -8,6 +8,7 @@ use Illuminate\Http\Response;
 use App\Models\Order;
 use Illuminate\Support\Facades\DB;
 use App\Services\AnalysisService;
+use App\Services\DecileService;
 
 class AnalysisController extends Controller
 {
@@ -26,6 +27,10 @@ class AnalysisController extends Controller
         
         if($request->type === 'perYear'){
             list($data, $labels, $totals) = AnalysisService::perYear($subQuery);
+        }
+        
+        if($request->type === 'decile'){
+            list($data, $labels, $totals) = DecileService::decile($subQuery);
         }
         
         // Ajax通信なのでJsonで返却する必要がある
