@@ -3,6 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/inertia-vue3';
 import { reactive, onMounted } from 'vue'
 import { getToday } from '@/common'
+import Chart from '@/Components/Chart.vue'
 
 onMounted(() => {
     form.startDate = getToday()
@@ -56,6 +57,7 @@ const getData = async () => {
                             To: <input type="date" name="endDate" v-model="form.endDate">
                             <button class="flex mt-4 mx-auto text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-lg">分析する</button>
                         </form>
+                        <Chart />
                         <div  v-show="data.data" class="lg:w-2/3 w-full mx-auto overflow-auto">
                             <table class="table-auto w-full text-left whitespace-no-wrap">
                                 <thead>
