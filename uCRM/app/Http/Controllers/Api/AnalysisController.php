@@ -19,6 +19,14 @@ class AnalysisController extends Controller
             // 配列を受け取り変数に格納するため list() を使う
             list($data, $labels, $totals) = AnalysisService::perDay($subQuery); 
         }
+
+        if($request->type === 'perMonth'){
+            list($data, $labels, $totals) = AnalysisService::perMonth($subQuery);
+        }
+        
+        if($request->type === 'perYear'){
+            list($data, $labels, $totals) = AnalysisService::perYear($subQuery);
+        }
         
         // Ajax通信なのでJsonで返却する必要がある
         return response()->json([
