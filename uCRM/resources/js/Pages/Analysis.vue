@@ -15,6 +15,8 @@ const form = reactive({
     type: 'perDay'
 })
 
+const data = reactive({})
+
 const getData = async () => {
     try{
         await axios.get('/api/analysis/', {
@@ -25,8 +27,7 @@ const getData = async () => {
         }
     })
     .then( res => {
-        // data.value = res.data
-        console.log(res.data)
+        data.data = res.data.data
     })
     } catch (e){
         console.log(e.message)
@@ -55,6 +56,22 @@ const getData = async () => {
                             To: <input type="date" name="endDate" v-model="form.endDate">
                             <button class="flex mt-4 mx-auto text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-lg">分析する</button>
                         </form>
+                        <div  v-show="data.data" class="lg:w-2/3 w-full mx-auto overflow-auto">
+                            <table class="table-auto w-full text-left whitespace-no-wrap">
+                                <thead>
+                                <tr>
+                                    <th class="px-4 py-3 title-font tracking-wider font-medium text-gray-900 text-sm bg-gray-100 rounded-tl rounded-bl">年月日</th>
+                                    <th class="px-4 py-3 title-font tracking-wider font-medium text-gray-900 text-sm bg-gray-100">金額</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr v-for="item in data.data" :key="item.data">
+                                    <td class="px-4 py-3">{{ item.date }}</td>
+                                    <td class="px-4 py-3">{{ item.total }}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
