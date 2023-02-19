@@ -12,7 +12,7 @@ class AnalysisController extends Controller
     public function index()
     {
         // 期間指定
-        $startDate = '2021-08-01';
+        $startDate = '2021-08-20';
         $endDate = '2022-08-31';
 
         // // 1. 購買ID毎にまとめる
@@ -173,27 +173,30 @@ class AnalysisController extends Controller
         $total = DB::table($subQuery)->count();
 
         $rCount = DB::table($subQuery)
-        ->groupBy('r')
-        ->selectRaw('r, count(r)')
+        ->rightJoin('ranks', 'ranks.rank', '=', 'r')
+        ->groupBy('rank')
+        ->selectRaw('rank as r, count(r)')
         ->orderBy('r', 'desc')
         ->pluck('count(r)');
 
         $fCount = DB::table($subQuery)
-        ->groupBy('f')
-        ->selectRaw('f, count(f)')
+        ->rightJoin('ranks', 'ranks.rank', '=', 'f')
+        ->groupBy('rank')
+        ->selectRaw('rank as f, count(f)')
         ->orderBy('f', 'desc')
         ->pluck('count(f)');
 
         $mCount = DB::table($subQuery)
-        ->groupBy('m')
-        ->selectRaw('m, count(m)')
+        ->rightJoin('ranks', 'ranks.rank', '=', 'm')
+        ->groupBy('rank')
+        ->selectRaw('rank as m, count(m)')
         ->orderBy('m', 'desc')
         ->pluck('count(m)');
 
         $eachCount = []; // Vue側に渡すようの空の配列
         $rank = 5; // 初期値5
 
-        for($i = 0; $i < 1; $i++){
+        for($i = 0; $i < 5; $i++){
             array_push($eachCount, [
                 'rank' => $rank,
                 'r' => $rCount[$i],
@@ -203,15 +206,14 @@ class AnalysisController extends Controller
             // rankを1ずつ減らす
             $rank--;
         }
-        
-        // dd($total, $eachCount, $rCount, $fCount, $mCount);
 
         // concatで文字列結合
         // 6. RとFで2次元で表示してみる
         $data = DB::table($subQuery)
-        ->groupBy('r')
+        ->rightJoin('ranks', 'ranks.rank', '=', 'r')
+        ->groupBy('rank')
         ->selectRaw('
-            concat("r_", r) as rRank,
+            concat("r_", rank) as rRank,
             count(case when f = 5 then 1 end ) as f_5,
             count(case when f = 4 then 1 end ) as f_4,
             count(case when f = 3 then 1 end ) as f_3,
@@ -221,7 +223,7 @@ class AnalysisController extends Controller
         ->orderBy('rRank', 'desc')
         ->get();
 
-        // dd($data);
+        // dd($total, $eachCount, $rCount, $fCount, $mCount, $data);
 
         return Inertia::render('Analysis');
     } 
